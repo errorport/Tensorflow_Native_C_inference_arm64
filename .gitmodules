@@ -1,0 +1,3 @@
+[submodule "keras-model-to-cpp"]
+	path = keras-model-to-cpp
+	url = https://github.com/harmanpreet93/keras-model-to-cpp.git
