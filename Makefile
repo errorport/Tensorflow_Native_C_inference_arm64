@@ -7,33 +7,34 @@ else
 	CFLAGS+=${RELEASE_FLAGS}
 endif
 
-all:	options gen_model ${OMODEL} ${BUILDDIR}/aimotive_inference
+all:	options gen_model ${BINS}
 
-aimotive_inference:
-	if [ ! -d "build" ]; then \
-		mkdir build; \
-	fi
-
-.c.o:
-	${CC} -c ${CFLAGS} $<
+only_bin: options ${BINS}
 
 options:
 	@echo	"aimotive test aarch64 native inference - BencsikG"
-	@echo	"CFLAGS	=	${CFLAGS}"
-	@echo	"CC	=	${CC}"
+	@echo	"CFLAGS  =	${CFLAGS}"
+	@echo	"LDFLAGS =	${LDFLAGS}"
+	@echo	"CC      =	${CC}"
 
-gen_model:
+gen_model: ${MODEL_DEPS}
+	@echo	"Generating the model sources"
 	python model/model_to_cpp.py -a model/aimotive_test.json -w model/aimotive_test.h5 -v1 -o model/model
 
-${OBJDIR}/model.o: ${MODELSRC}
+${OMODEL}: ${MODELSRC}
 	@echo	"Compiling model.o"
 	mkdir -p '${@D}'
 	${CC} ${CFLAGS} -c -o $@ ${MODELSRC} -I model/
 
-${BUILDDIR}/aimotive_inference: ${SRCDIR}/inference.c ${OBJ}
+${OUTILS}: ${UTILSSRC}
+	@echo	"Compiling utils.o"
+	mkdir -p '${@D}'
+	${CC} ${CFLAGS} -c -o $@ ${UTILSSRC} -I src/
+
+${OINFERENCE}: ${SRCDIR}/inference.c ${OBJ} ${SRCS}
 	@echo	"Compiling aimotive_inference"
 	mkdir -p '${@D}'
-	${CC} ${CFLAGS} $< -o $@ -I model/ 
+	${CC} ${CFLAGS} $< -o $@ ${SRCS} -I model/ -I src/ ${LDFLAGS}
 
 run:
 	qemu-aarch64 ${BUILDDIR}/aimotive_inference -m 1M -cpu cortex-a53 -nographic 
@@ -41,6 +42,12 @@ run:
 clean:
 	if [ -d "${BUILDDIR}" ]; then \
 		rm -rf ${BUILDDIR}/; \
+	fi
+	if [ -f "${MODELSRC}" ]; then \
+		rm ${MODELSRC};\
+	fi
+	if [ -f "model/model.h" ]; then \
+		rm model/model.h;\
 	fi
 
 .PHONY:	all	options	run	clean
