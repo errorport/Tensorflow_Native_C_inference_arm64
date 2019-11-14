@@ -45,7 +45,7 @@ header_str += '\n'
 header_str += '#define LAYERS ' + str(len(model.layers)) + '\n'
 features = model.get_weights()[0].shape[0]
 header_str += '#define FEATURES ' + str(features) + '\n'
-header_str += '#define NUMNODES { __NODESTR__  }\n'
+header_str += 'extern const uint16_t numnodes[LAYERS-1];\n'
 header_str += 'enum ACTIVATION_FUNC{RELU, SOFTMAX};\n'
 header_str += 'extern const uint16_t layer_sizes[LAYERS][2];\n'
 
@@ -84,8 +84,6 @@ for ind, l in enumerate(arch["config"]['layers']):
             beta_index += 1
         source_str += '}; // end of beta_'+ str(ind) +'\n'
 
-header_str = header_str.replace('__NODESTR__', node_str)
-
 header_str += 'extern const float_t* weightMap[LAYERS-1];\n'
 source_str += 'const float_t* weightMap[LAYERS-1] = {\n'
 for ind, l in enumerate(arch["config"]['layers']):
@@ -99,6 +97,8 @@ for ind, l in enumerate(arch["config"]['layers']):
     if ind > 0:
         source_str += '&beta_' + str(ind) + '[0],\n'
 source_str += '};\n'
+
+source_str += 'const uint16_t numnodes[LAYERS-1] = {'+ node_str +'};\n'
 
 header_str += '#endif // __MODEL_H'
 
