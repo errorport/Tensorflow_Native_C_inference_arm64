@@ -45,7 +45,7 @@ header_str += '\n'
 header_str += '#define LAYERS ' + str(len(model.layers)) + '\n'
 features = model.get_weights()[0].shape[0]
 header_str += '#define FEATURES ' + str(features) + '\n'
-header_str += 'extern const uint16_t numnodes[LAYERS-1];\n'
+header_str += 'extern const uint16_t numnodes[LAYERS];\n'
 header_str += 'enum ACTIVATION_FUNC{RELU, SOFTMAX};\n'
 header_str += 'extern const uint16_t layer_sizes[LAYERS][2];\n'
 
@@ -61,9 +61,11 @@ for ind, l in enumerate(arch["config"]['layers']):
 source_str += '}; // end of layer_sizes\n'
 
 for ind, l in enumerate(arch["config"]['layers']):
+    nodes = features # in case of the input layer.
     if l['class_name'] == 'Dense':
         W = model.layers[ind].get_weights()[0]
         B = model.layers[ind].get_weights()[1]
+        nodes = len(B)
         header_str += 'extern const float theta_'+ str(ind) +' [' + str(W.shape[0]) + '][' + str(W.shape[1]) +'];\n' 
         source_str += 'const float theta_'+ str(ind)  +' [' + str(W.shape[0]) + '][' + str(W.shape[1]) +'] = {\n'
         theta_index = 0
@@ -77,12 +79,17 @@ for ind, l in enumerate(arch["config"]['layers']):
 
         header_str += 'extern const float beta_'+ str(ind)  +' [' + str(len(B)) + '];\n'
         source_str += 'const float beta_'+ str(ind)  +' [' + str(len(B)) + '] = {\n'
-        beta_index = 0
-        node_str += str(len(B)) + ', '
         for b in B:
             source_str += str(b)+', '
-            beta_index += 1
         source_str += '}; // end of beta_'+ str(ind) +'\n'
+
+    header_str += 'extern float alpha_'+ str(ind)  +' [' + str(nodes) + '];\n'
+    source_str += 'float alpha_'+ str(ind)  +' [' + str(nodes) + '] = {\n'
+    for a in range(nodes):
+        source_str += '0, '
+    node_str += str(nodes) + ', '
+    source_str += '}; // end of alpha_'+ str(ind) +'\n'
+
 
 header_str += 'extern const float_t* weightMap[LAYERS-1];\n'
 source_str += 'const float_t* weightMap[LAYERS-1] = {\n'
@@ -98,7 +105,13 @@ for ind, l in enumerate(arch["config"]['layers']):
         source_str += '&beta_' + str(ind) + '[0],\n'
 source_str += '};\n'
 
-source_str += 'const uint16_t numnodes[LAYERS-1] = {'+ node_str +'};\n'
+header_str += 'extern const float_t* activationMap[LAYERS];\n'
+source_str += 'const float_t* activationMap[LAYERS] = {\n'
+for ind, l in enumerate(arch["config"]['layers']):
+    source_str += '&alpha_' + str(ind) + '[0],\n'
+source_str += '};\n'
+
+source_str += 'const uint16_t numnodes[LAYERS] = {'+ node_str +'};\n'
 
 header_str += '#endif // __MODEL_H'
 
