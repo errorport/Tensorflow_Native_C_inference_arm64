@@ -35,6 +35,8 @@ arch = json.loads(arch)
 header_str = ""
 source_str = ""
 node_str = ""
+activation_str = ""
+alpha_str = ""
 
 header_str += '// This methodology is originated from https://github.com/harmanpreet93/keras-model-to-cpp.\n\n'
 header_str += '#ifndef __MODEL__H\n'
@@ -44,9 +46,12 @@ header_str += '#include <math.h>\n'
 header_str += '\n'
 header_str += '#define LAYERS ' + str(len(model.layers)) + '\n'
 features = model.get_weights()[0].shape[0]
+outputs = model.get_weights()[-1].shape[0]
 header_str += '#define FEATURES ' + str(features) + '\n'
+header_str += '#define OUTPUTS ' + str(outputs) + '\n'
 header_str += 'extern const uint16_t numnodes[LAYERS];\n'
-header_str += 'enum ACTIVATION_FUNC{RELU, SOFTMAX};\n'
+header_str += 'typedef enum {NONE, RELU, SOFTMAX, SIGMOID}ACTIVATION_FUNC;\n'
+header_str += 'extern const ACTIVATION_FUNC activation_functions[LAYERS];\n'
 header_str += 'extern const uint16_t layer_sizes[LAYERS][2];\n'
 
 source_str += '#include "model.h"\n'
@@ -62,7 +67,9 @@ source_str += '}; // end of layer_sizes\n'
 
 for ind, l in enumerate(arch["config"]['layers']):
     nodes = features # in case of the input layer.
+    activation = 'NONE'
     if l['class_name'] == 'Dense':
+        activation = model.layers[ind].get_config()['activation'].upper()
         W = model.layers[ind].get_weights()[0]
         B = model.layers[ind].get_weights()[1]
         nodes = len(B)
@@ -82,8 +89,9 @@ for ind, l in enumerate(arch["config"]['layers']):
         for b in B:
             source_str += str(b)+', '
         source_str += '}; // end of beta_'+ str(ind) +'\n'
+    activation_str += activation + ', '
 
-    header_str += 'extern float alpha_'+ str(ind)  +' [' + str(nodes) + '];\n'
+    header_str += 'float alpha_'+ str(ind)  +' [' + str(nodes) + '];\n'
     source_str += 'float alpha_'+ str(ind)  +' [' + str(nodes) + '] = {\n'
     for a in range(nodes):
         source_str += '0, '
@@ -105,14 +113,17 @@ for ind, l in enumerate(arch["config"]['layers']):
         source_str += '&beta_' + str(ind) + '[0],\n'
 source_str += '};\n'
 
-header_str += 'extern const float_t* activationMap[LAYERS];\n'
-source_str += 'const float_t* activationMap[LAYERS] = {\n'
+header_str += 'extern float_t* activationMap[LAYERS];\n'
+source_str += 'float_t* activationMap[LAYERS] = {'
 for ind, l in enumerate(arch["config"]['layers']):
-    source_str += '&alpha_' + str(ind) + '[0],\n'
+    source_str += '&alpha_' + str(ind) + '[0],'
 source_str += '};\n'
 
 source_str += 'const uint16_t numnodes[LAYERS] = {'+ node_str +'};\n'
+source_str += 'const ACTIVATION_FUNC activation_functions[LAYERS] = {'\
+                + activation_str +'};\n'
 
+#header_str += '#define ALPHA ' + alpha_str + '\n'
 header_str += '#endif // __MODEL_H'
 
 with open(args.output+'.h', 'w') as fout:

@@ -31,13 +31,22 @@ ${OUTILS}: ${UTILSSRC}
 	mkdir -p '${@D}'
 	${CC} ${CFLAGS} -c -o $@ ${UTILSSRC} -I src/
 
+${OTEST}: ${TESTSRC}
+	@echo	"Compiling test"
+	mkdir -p '${@D}'
+	${CC} ${CFLAGS} $< -o $@ ${OUTILS} -I model/ -I src/ ${LDFLAGS}
+
 ${OINFERENCE}: ${SRCDIR}/inference.c ${OBJ} ${SRCS}
 	@echo	"Compiling aimotive_inference"
 	mkdir -p '${@D}'
 	${CC} ${CFLAGS} $< -o $@ ${SRCS} -I model/ -I src/ ${LDFLAGS}
 
 run:
-	qemu-aarch64 ${BUILDDIR}/aimotive_inference -m 1M -cpu cortex-a53 -nographic 
+	qemu-aarch64 ${OINFERENCE} ${INPUT_FILE_NAME} -m 1M -cpu cortex-a53 -nographic 
+
+runtest:
+	qemu-aarch64 ${OTEST} -m 1M -cpu cortex-a53 -nographic 
+
 
 clean:
 	if [ -d "${BUILDDIR}" ]; then \

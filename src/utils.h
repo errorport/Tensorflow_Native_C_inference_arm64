@@ -30,7 +30,10 @@ relu(float input);
  *		(k)
  */
 float
-softmax(float* input_array, int index, int input_length);
+softmax(float input_array[], int index, int input_length);
+
+float
+sigmoid(float);
 
 #endif // __UTILS__H
 
