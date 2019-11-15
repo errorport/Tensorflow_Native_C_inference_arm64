@@ -43,7 +43,7 @@ ${OTEST}: ${TESTSRC}
 	${CC} ${CFLAGS} $< -o $@ ${OUTILS} -I model/ -I src/ ${LDFLAGS}
 
 ${OINFERENCE}: ${SRCDIR}/inference.c ${OBJ} ${SRCS}
-	@echo	"Compiling aimotive_inference"
+	@echo	"Compiling inference"
 	mkdir -p '${@D}'
 	${CC} ${CFLAGS} $< -o $@ ${SRCS} -I model/ -I src/ ${LDFLAGS}
 

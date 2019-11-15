@@ -18,7 +18,7 @@ SRCS=${MODELSRC} ${UTILSSRC}
 OMODEL=${OBJDIR}/model.o
 OUTILS=${OBJDIR}/utils.o
 OTEST=${BUILDDIR}/test
-OINFERENCE=${BUILDDIR}/aimotive_inference
+OINFERENCE=${BUILDDIR}/inference
 OBJ=${OMODEL} ${OUTILS} ${OTEST}
 
 MODEL_JSON_FILE=model/model.json
