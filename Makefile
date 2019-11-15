@@ -12,7 +12,7 @@ all:	options train_model gen_model ${BINS}
 only_bin: options ${BINS}
 
 options:
-	@echo	"aimotive test aarch64 native inference - BencsikG"
+	@echo	"TF aarch64 native inference without TF - BencsikG"
 	@echo	"CFLAGS  =	${CFLAGS}"
 	@echo	"LDFLAGS =	${LDFLAGS}"
 	@echo	"CC      =	${CC}"
