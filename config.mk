@@ -21,7 +21,9 @@ OTEST=${BUILDDIR}/test
 OINFERENCE=${BUILDDIR}/aimotive_inference
 OBJ=${OMODEL} ${OUTILS} ${OTEST}
 
-MODEL_FILES=model/aimotive_test.h5 model/aimotive_test.json
+MODEL_JSON_FILE=model/model.json
+MODEL_H5_FILE=model/model.h5
+MODEL_FILES=${MODEL_JSON_FILE} ${MODEL_H5_FILE}
 MODEL_CONVERTER=model/model_to_cpp.py
 MODEL_DEPS=${MODEL_FILES} ${MODEL_CONVERTER}
 

@@ -1,4 +1,5 @@
 import tensorflow as tf
+import sys
 
 mnist = tf.keras.datasets.mnist
 
@@ -23,9 +24,9 @@ model.evaluate(x_test, y_test)
 
 model.summary()
 
-model.save("aimotive_test.h5")
+model.save(sys.argv[1])
 json_config = model.to_json()
-with open("aimotive_test.json", 'w') as json_file:
+with open(sys.argv[2], 'w') as json_file:
     json_file.write(json_config)
 
 import gc

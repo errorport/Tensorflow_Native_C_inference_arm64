@@ -7,7 +7,7 @@ else
 	CFLAGS+=${RELEASE_FLAGS}
 endif
 
-all:	options gen_model ${BINS}
+all:	options train_model gen_model ${BINS}
 
 only_bin: options ${BINS}
 
@@ -17,9 +17,15 @@ options:
 	@echo	"LDFLAGS =	${LDFLAGS}"
 	@echo	"CC      =	${CC}"
 
+train_model:
+	@echo	"Training model"
+	python 	model/toy_mnist_eval.py ${MODEL_H5_FILE} ${MODEL_JSON_FILE}
+
 gen_model: ${MODEL_DEPS}
 	@echo	"Generating the model sources"
-	python model/model_to_cpp.py -a model/aimotive_test.json -w model/aimotive_test.h5 -v1 -o model/model
+	python model/model_to_cpp.py -a ${MODEL_JSON_FILE} -w ${MODEL_H5_FILE} -v1 -o model/model
+	@echo	"Generating test set"
+	python test/gen_test.py test/
 
 ${OMODEL}: ${MODELSRC}
 	@echo	"Compiling model.o"
