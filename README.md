@@ -7,6 +7,7 @@ Without Tensorflow API!
 | ------- | ------- | ---- |
 | qemu-aarch64 | 4.0.0 | with xattr |
 | aarch64-unknown-linux-gnu-gcc | 8.3.0 | Tested with Gentoo 8.3.0-r1 p1.1 (crossdev-20190702) |
+| aarch64-unknown-linux-gnu-strip | 2.32.0 | Tested with Gentoo 2.32 p2 (crossdev-20190702) |
 | GNU Make | 4.2.1 | |
 | Python3 | 3.6.5 | |
 | tensorflow | 2.0.0 | pip package |

@@ -47,6 +47,9 @@ ${OINFERENCE}: ${SRCDIR}/inference.c ${OBJ} ${SRCS}
 	mkdir -p '${@D}'
 	${CC} ${CFLAGS} $< -o $@ ${SRCS} -I model/ -I src/ ${LDFLAGS}
 
+postcompile:
+	aarch64-unknown-linux-gnu-strip ${OINFERENCE}
+
 run:
 	qemu-aarch64 ${OINFERENCE} ${INPUT_FILE_NAME} -m 1M -cpu cortex-a53 -nographic 
 

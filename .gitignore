@@ -7,4 +7,7 @@ model/*.c
 model/*.h5
 model/*.json
 test/x_test*
+*.zip
+*.tar*
+*.bz2
 
