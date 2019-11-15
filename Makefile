@@ -7,7 +7,7 @@ else
 	CFLAGS+=${RELEASE_FLAGS}
 endif
 
-all:	options train_model gen_model ${BINS}
+all:	options train_model gen_model ${BINS} postcompile
 
 only_bin: options ${BINS}
 
