@@ -15,13 +15,14 @@ int main(int argc, char *argv[])
 	float output_buffer[OUTPUTS];
 	FILE *input_file_ptr;
 	input_file_ptr = fopen(argv[1],"rb");
-	fread(input_buffer, FEATURES, sizeof(uint8_t), input_file_ptr);
+	size_t ret = fread(input_buffer, FEATURES, sizeof(uint8_t), input_file_ptr);
 	fclose(input_file_ptr);
 	// Normalizing byte type input to float {0..1}
 	for(int input_index = 0; input_index < FEATURES; input_index++)
 	{
 		alpha_0[input_index]
 			= (float) input_buffer[input_index] / 255.0;
+		// Thresholded visualization
 		if(input_buffer[input_index]>0xf0)
 		{
 			printf("+");
@@ -35,6 +36,7 @@ int main(int argc, char *argv[])
 			printf("\n");
 		}
 	}
+	// Feedforward prediction
 	printf("%s", "Calculating activations\n");
 	for(int layer_index = 0; layer_index < LAYERS-1; layer_index++)
 	{
@@ -52,7 +54,7 @@ int main(int argc, char *argv[])
 			}
 
 			activationMap[layer_index+1][j] = zeta+biasMap[layer_index][j];
-			//printf("%d, %d: zeta %f, bias %f\n", layer_index+1, j, zeta, biasMap[layer_index][j]);
+			// Appling activation functions
 			if(activation_functions[layer_index+1] == RELU)
 			{
 				activationMap[layer_index+1][j]
@@ -65,6 +67,8 @@ int main(int argc, char *argv[])
 			}
 		}
 	}
+	// Applying output activation function
+	// Filling up the output buffer.
 	for(int j = 0; j < OUTPUTS; j++)
 	{
 		if(activation_functions[LAYERS-1] == SOFTMAX)
@@ -76,11 +80,6 @@ int main(int argc, char *argv[])
 				, numnodes[LAYERS-1]
 			);
 		}
-	}
-
-	for(int i=0; i<64; i++)
-	{
-		//printf("%f _ %f\n", beta_2[i], biasMap[1][i]);
 	}
 
 	printf("Output activations:\n");
@@ -97,7 +96,6 @@ int main(int argc, char *argv[])
 			max_index = output_node_index;
 		}
 	}
-	//printf("w %f\n", weightMap[0][1*64+0]);
 	printf("Prediction: %d\n", max_index);
 	return 0;
 }

@@ -4,5 +4,7 @@
 build/
 model/*.h
 model/*.c
+model/*.h5
+model/*.json
 test/x_test*
 
