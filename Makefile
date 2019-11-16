@@ -1,4 +1,5 @@
 include config.mk
+include arch_conf.mk
 
 DEBUG ?= 1
 ifeq ($(DEBUG), 1)
@@ -13,9 +14,10 @@ only_bin: options ${BINS}
 
 options:
 	@echo	"TF aarch64 native inference without TF - BencsikG"
-	@echo	"CFLAGS  =	${CFLAGS}"
-	@echo	"LDFLAGS =	${LDFLAGS}"
-	@echo	"CC      =	${CC}"
+	@echo	"CFLAGS  	=	${CFLAGS}"
+	@echo	"LDFLAGS 	=	${LDFLAGS}"
+	@echo	"CC      	=	${CC}"
+	@echo	"ARCH_FLAGS	=	${ARCH_FLAGS}"
 
 train_model:
 	@echo	"Training model"
@@ -30,22 +32,22 @@ gen_model: ${MODEL_DEPS}
 ${OMODEL}: ${MODELSRC}
 	@echo	"Compiling model.o"
 	mkdir -p '${@D}'
-	${CC} ${CFLAGS} -c -o $@ ${MODELSRC} -I model/
+	${CC} ${CFLAGS} ${ARCH_FLAGS}-c -o $@ ${MODELSRC} -I model/
 
 ${OUTILS}: ${UTILSSRC}
 	@echo	"Compiling utils.o"
 	mkdir -p '${@D}'
-	${CC} ${CFLAGS} -c -o $@ ${UTILSSRC} -I src/
+	${CC} ${CFLAGS} ${ARCH_FLAGS}-c -o $@ ${UTILSSRC} -I src/
 
 ${OTEST}: ${TESTSRC}
 	@echo	"Compiling test"
 	mkdir -p '${@D}'
-	${CC} ${CFLAGS} $< -o $@ ${OUTILS} -I model/ -I src/ ${LDFLAGS}
+	${CC} ${CFLAGS} ${ARCH_FLAGS}$< -o $@ ${OUTILS} -I model/ -I src/ ${LDFLAGS}
 
 ${OINFERENCE}: ${SRCDIR}/inference.c ${OBJ} ${SRCS}
 	@echo	"Compiling inference"
 	mkdir -p '${@D}'
-	${CC} ${CFLAGS} $< -o $@ ${SRCS} -I model/ -I src/ ${LDFLAGS}
+	${CC} ${CFLAGS} ${ARCH_FLAGS}$< -o $@ ${SRCS} -I model/ -I src/ ${LDFLAGS}
 
 postcompile:
 	aarch64-unknown-linux-gnu-strip ${OINFERENCE}
