@@ -24,7 +24,7 @@ train_model:
 	python 	model/toy_mnist_eval.py ${MODEL_H5_FILE} ${MODEL_JSON_FILE}
 
 gen_model: ${MODEL_DEPS}
-	@echo	"Generating the model sources"
+	@echo	"Generating model sources"
 	python model/model_to_cpp.py -a ${MODEL_JSON_FILE} -w ${MODEL_H5_FILE} -v1 -o model/model
 	@echo	"Generating test set"
 	python test/gen_test.py test/
@@ -53,10 +53,10 @@ postcompile:
 	aarch64-unknown-linux-gnu-strip ${OINFERENCE}
 
 run:
-	qemu-aarch64 ${OINFERENCE} ${INPUT_FILE_NAME} -m 1M -cpu cortex-a53 -nographic 
+	qemu-aarch64 ${OINFERENCE} ${INPUT_FILE_NAME} -m 1M -cpu cortex-a53 -nographic
 
 runtest:
-	qemu-aarch64 ${OTEST} -m 1M -cpu cortex-a53 -nographic 
+	qemu-aarch64 ${OTEST} -m 1M -cpu cortex-a53 -nographic
 
 
 clean:

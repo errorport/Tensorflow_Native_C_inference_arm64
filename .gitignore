@@ -10,4 +10,5 @@ test/x_test*
 *.zip
 *.tar*
 *.bz2
+venv/
 

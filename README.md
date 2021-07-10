@@ -13,11 +13,18 @@ Without Tensorflow API!
 | tensorflow | 2.0.0 | pip package |
 | numpy | 1.14.5 | pip package |
 
+## Deployment
+
+```sh
+./deploy.sh
+```
+
 ## Compiling
 
 For the first time, make does the hard job:
 
 ```sh
+source venv/bin/activate
 make
 ```
 
